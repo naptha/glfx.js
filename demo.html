@@ -1,0 +1,55 @@
+<script>
+var exports = {};
+var fx = exports;
+</script>
+
+<script src="src/OES_texture_float_linear-polyfill.js"></script>
+
+<script src="src/core/matrix.js"></script>
+<script src="src/core/shader.js"></script>
+<script src="src/core/spline.js"></script>
+<script src="src/core/texture.js"></script>
+<script src="src/filters/common.js"></script>
+
+<script src="src/filters/cv/sobel.js"></script>
+
+<script src="src/filters/adjust/brightnesscontrast.js"></script>
+<script src="src/filters/adjust/curves.js"></script>
+<script src="src/filters/adjust/denoise.js"></script>
+<script src="src/filters/adjust/huesaturation.js"></script>
+<script src="src/filters/adjust/noise.js"></script>
+<script src="src/filters/adjust/sepia.js"></script>
+<script src="src/filters/adjust/unsharpmask.js"></script>
+<script src="src/filters/adjust/vibrance.js"></script>
+<script src="src/filters/adjust/vignette.js"></script>
+<script src="src/filters/blur/lensblur.js"></script>
+<script src="src/filters/blur/tiltshift.js"></script>
+<script src="src/filters/blur/triangleblur.js"></script>
+<script src="src/filters/blur/zoomblur.js"></script>
+<script src="src/filters/fun/colorhalftone.js"></script>
+<script src="src/filters/fun/dotscreen.js"></script>
+<script src="src/filters/fun/edgework.js"></script>
+<script src="src/filters/fun/hexagonalpixelate.js"></script>
+<script src="src/filters/fun/ink.js"></script>
+<script src="src/filters/warp/bulgepinch.js"></script>
+<script src="src/filters/warp/matrixwarp.js"></script>
+<script src="src/filters/warp/perspective.js"></script>
+<script src="src/filters/warp/swirl.js"></script>
+<script src="src/core/canvas.js"></script>
+<script>
+
+window.onload = function() {
+    var canvas = fx.canvas();
+    var image = document.getElementById('image');
+    var texture = canvas.texture(image);
+    document.body.appendChild(canvas);
+    // canvas.draw(texture).swirl(canvas.width / 2, canvas.height / 2, 250, 3).update();
+    canvas.draw(texture).sobel(1).update();
+    texture.destroy();
+    texture = canvas.contents();
+    canvas.draw(texture).ink(0.25).update();
+};
+
+</script>
+<img id="image" src="tests/image.jpg">
+<p>This tests the usage of <code>canvas.contents()</code>. The image below should be the image above after applying the swirl filter followed by the ink filter.</p>
