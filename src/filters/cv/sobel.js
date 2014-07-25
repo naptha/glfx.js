@@ -20,7 +20,7 @@ function sobel() {
             float vc = sample(-1,-1) *  1.0 + sample(-1, 0) *  2.0\
               		 	 + sample(-1, 1) *  1.0 + sample( 1,-1) * -1.0\
               		 	 + sample( 1, 0) * -2.0 + sample( 1, 1) * -1.0;\
-            gl_FragColor = vec4(hc * hc, vc * vc, 0.0, 1.0);\
+            gl_FragColor = vec4(hc, vc, sqrt(hc * hc + vc * vc), 1.0);\
         }\
     ');
 

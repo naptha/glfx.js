@@ -12,6 +12,7 @@ var fx = exports;
 <script src="src/filters/common.js"></script>
 
 <script src="src/filters/cv/sobel.js"></script>
+<script src="src/filters/cv/canny.js"></script>
 
 <script src="src/filters/adjust/brightnesscontrast.js"></script>
 <script src="src/filters/adjust/curves.js"></script>
@@ -44,10 +45,10 @@ window.onload = function() {
     var texture = canvas.texture(image);
     document.body.appendChild(canvas);
     // canvas.draw(texture).swirl(canvas.width / 2, canvas.height / 2, 250, 3).update();
-    canvas.draw(texture).sobel(1).update();
-    texture.destroy();
-    texture = canvas.contents();
-    canvas.draw(texture).ink(0.25).update();
+    canvas.draw(texture).sobel().canny().update();
+    // texture.destroy();
+    // texture = canvas.contents();
+    // canvas.draw(texture).ink(0.25).update();
 };
 
 </script>

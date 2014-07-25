@@ -179,6 +179,7 @@ exports.canvas = function() {
     canvas.vibrance = wrap(vibrance);
     canvas.sepia = wrap(sepia);
     canvas.sobel = wrap(sobel);
+    canvas.canny = wrap(canny);
 
     return canvas;
 };
