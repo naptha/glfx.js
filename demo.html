@@ -13,6 +13,8 @@ var fx = exports;
 
 <script src="src/filters/cv/sobel.js"></script>
 <script src="src/filters/cv/canny.js"></script>
+<script src="src/filters/cv/grayscale.js"></script>
+<script src="src/filters/cv/swt.js"></script>
 
 <script src="src/filters/adjust/brightnesscontrast.js"></script>
 <script src="src/filters/adjust/curves.js"></script>
@@ -37,20 +39,96 @@ var fx = exports;
 <script src="src/filters/warp/perspective.js"></script>
 <script src="src/filters/warp/swirl.js"></script>
 <script src="src/core/canvas.js"></script>
+
+<script src="jsfeat-custom.js"></script>
+
 <script>
+var params = {
+	// the kernel size for the gaussian blur before canny
+	kernel_size: 3,
+	// low and high thresh are parameters for the canny edge detector
+	low_thresh: 124,
+	high_thresh: 204,
+	// maximum stroke width, this is the number of iterations
+	// the core stroke width transform loop will go through
+	// before giving up and saying that there is no stroke here
+	max_stroke: 35
+};
+function jsfeat_filter(){
+  var image = document.getElementById('image');
+  var canvas = document.createElement('canvas');
+  var width = image.width, height = image.width;
+  canvas.width = width;
+  canvas.height = width;
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(image, 0, 0);
+  document.body.appendChild(canvas)
+
+  var src = ctx.getImageData(0, 0, width, height)
+  var img_u8 = new jsfeat.matrix_t(width, height, jsfeat.U8C1_t)
+  var img_dxdy = new jsfeat.matrix_t(width, height, jsfeat.S32C2_t);
+  console.time('jsfeat')
+  jsfeat.imgproc.grayscale(src.data, img_u8.data)
+  visualize_matrix(img_u8)
+
+  jsfeat.imgproc.sobel_derivatives(img_u8, img_dxdy)
+  jsfeat.imgproc.gaussian_blur(img_u8, img_u8, params.kernel_size, 0)
+  jsfeat.imgproc.canny(img_u8, img_u8, params.low_thresh, params.high_thresh)
+  console.timeEnd('jsfeat')
+  visualize_matrix(img_u8)
+  // visualize_matrix(img_dxdy)
+
+  var data_u32 = new Uint32Array(src.data.buffer);
+  var alpha = (0xff << 24);
+  var i = img_u8.cols*img_u8.rows, pix=0, gx = 0, gy = 0;
+  while(--i >= 0) {
+      gx = img_dxdy.data[i<<1];
+      gy = img_dxdy.data[(i<<1)+1];
+      pix = (Math.abs(gx) + Math.abs(gy))&0xff;
+      data_u32[i] = alpha | (0 << 16) | (Math.abs(gx) << 8) | Math.abs(gy);
+  }
+
+  ctx.putImageData(src, 0, 0);
+}
+
+
+function visualize_matrix(mat){
+	var c = document.createElement('canvas')
+	c.width = mat.cols;
+	c.height = mat.rows;
+	var cx = c.getContext('2d')
+	var out = cx.createImageData(mat.cols, mat.rows);
+	for(var i = 0; i < mat.rows * mat.cols; i++){
+      out.data[i * 4 + 3] = 255;
+			out.data[i * 4] = out.data[i * 4 + 1] = out.data[i * 4 + 2] = mat.data[i]
+	}
+	cx.putImageData(out, 0, 0)
+  document.body.appendChild(c)
+	return cx
+}
 
 window.onload = function() {
+  jsfeat_filter();
+
     var canvas = fx.canvas();
     var image = document.getElementById('image');
+
     var texture = canvas.texture(image);
     document.body.appendChild(canvas);
+    console.time('glswt')
     // canvas.draw(texture).swirl(canvas.width / 2, canvas.height / 2, 250, 3).update();
-    canvas.draw(texture).sobel().canny().update();
+    canvas.draw(texture)
+      .triangleBlur(3)
+      // .grayscale()
+      .sobel()
+      .canny(0.5)
+      .update();
     // texture.destroy();
     // texture = canvas.contents();
     // canvas.draw(texture).ink(0.25).update();
+    console.timeEnd('glswt')
 };
 
 </script>
-<img id="image" src="tests/image.jpg">
+<img id="image" src="wifwurds.png">
 <p>This tests the usage of <code>canvas.contents()</code>. The image below should be the image above after applying the swirl filter followed by the ink filter.</p>

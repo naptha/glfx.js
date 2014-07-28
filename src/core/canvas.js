@@ -180,6 +180,7 @@ exports.canvas = function() {
     canvas.sepia = wrap(sepia);
     canvas.sobel = wrap(sobel);
     canvas.canny = wrap(canny);
+    canvas.grayscale = wrap(grayscale);
 
     return canvas;
 };

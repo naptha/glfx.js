@@ -1,13 +1,11 @@
 /**
- * @filter         Canny
- * @description
+ * @filter         Stroke Width Transform
+ * @description  Ephstein
  */
 
- // http://iosgpuar.blogspot.com/2011/12/canny-edge-detection-using-fragment.html
- // https://github.com/kalxas/gnorasi/blob/master/Gnorasi/modules/deprecated/glsl/canny.frag
 
-function canny(thresh) {
-    gl.canny = gl.canny || new Shader(null, '\
+function swt(thresh) {
+    gl.swt = gl.swt || new Shader(null, '\
         uniform sampler2D texture;\
         varying vec2 texCoord;\
         uniform vec2 texSize;\
@@ -29,7 +27,7 @@ function canny(thresh) {
         }\
     ');
 
-    simpleShader.call(this, gl.canny, {
+    simpleShader.call(this, gl.swt, {
         thresh: thresh,
         texSize: [this.width, this.height]
     });
